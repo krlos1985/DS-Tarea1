@@ -1,0 +1,95 @@
+#cargar librerías
+install.packages("stringr")
+library(readr)
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+
+#cargar datos
+epa_http <- read_table("Data Science/epa-http.csv", col_names = FALSE)
+
+#nombre columnas
+names(epa_http)<- c("URL", "Time", "Tipo", "Recurso", "Protocolo", "Post", " Bytes ")
+
+#1.1.	Cuáles son las dimensiones del dataset cargado (número de filas y columnas)
+
+#número de columnas
+nrow(epa_http)
+[1] 47748
+
+#número de filas
+ncol(epa_http)
+[1] 7
+
+#1.2.	Valor medio de la columna Bytes
+
+# Convierte a numero la columna Bytes
+epa_http$` Bytes `<- as.numeric(epa_http$` Bytes `)
+Warning message:
+NAs introduced by coercion 
+
+# Valor medio
+ mean(epa_http$` Bytes `, na.rm=TRUE)
+[1] 7352.335
+
+#2. De las diferentes IPs de origen accediendo al servidor, ¿cuántas pertenecen a una IP claramente educativa (que contenga ".edu")?
+
+# Filtra .edu
+edu_filter <- filter(epa_http, str_detect(epa_http $URL, ".edu"))
+
+# determinando cuantas son
+nrow(edu_filter)
+[1] 6539
+
+#3. De todas las peticiones recibidas por el servidor cual es la hora en la que hay mayor volumen de peticiones HTTP de tipo "GET"?
+
+# Limpia la columna Tipo
+epa_http$TipoLimp<- str_sub(epa_http$Tipo, 2)
+
+# Filtra GET
+get_filter <- filter(epa_http, str_detect(epa_http $TipoLimp, "GET"))
+View(get_filter)
+
+# Formato fecha y hora a columna Timestamps
+get_filter$Timestamps <- as.POSIXct(get_filter$Time, format = "[%d:%H:%M:%OS]")
+
+# Obtener la hora en cada registro
+get_filter$Hora <- format(get_filter$Timestamps, format = "%H")
+
+# Contabiliza numero de registros por hora
+Conteo <- table(get_filter$Hora)
+
+# Hora con el mayor numero de registros
+x <- names(sort(Conteo, decreasing = TRUE)[1])
+x
+[1] "14"
+
+#4. De las peticiones hechas por instituciones educativas (.edu), ¿Cuantos bytes en total se han transmitido, en peticiones de descarga de ficheros de texto ".txt"?
+
+# Filtra .edu
+edu_filter <- subset(epa_http, grepl("\\.edu", URL))
+
+# Filtra .txt
+txt_filter <- subset(edu_filter, grepl(".txt", Recurso))
+
+# Suma de Bytes
+ x <- sum(as.numeric(txt_filter$` Bytes `), na.rm = TRUE)
+Warning message:
+NAs introduced by coercion 
+ x
+[1] 3017871
+
+5. Si separamos la petición en 3 partes (Tipo, URL, Protocolo), usando str_split y el separador " " (espacio), ¿cuantas peticiones buscan directamente la URL = "/"?
+
+# Arreglo5
+Arreglo5 <- subset(epa_http, Recurso == "/")
+> nrow(Arreglo5)
+[1] 2382
+
+6. Aprovechando que hemos separado la petición en 3 partes (Tipo, URL, Protocolo) ¿Cuantas peticiones NO tienen como protocolo "HTTP/0.2"?
+
+# Arreglo6
+Arreglo6 <- subset(epa_http, !grepl("HTTP/0.2", Protocolo))
+nrow(Arreglo6)
+[1] 47747
