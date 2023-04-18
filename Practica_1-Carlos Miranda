@@ -30,7 +30,7 @@ epa_http$` Bytes `<- as.numeric(epa_http$` Bytes `)
 # 2. De las diferentes IPs de origen accediendo al servidor, ¿cuántas pertenecen a una IP claramente educativa (que contenga ".edu")?
 
 # Filtra .edu
-edu_filter <- filter(epa_http, str_detect(epa_http $URL, ".edu"))
+edu_filter <- filter(epa_http, str_detect(epa_http $URL, "\\.edu"))
 
 # determinando cuantas son
 nrow(edu_filter)
