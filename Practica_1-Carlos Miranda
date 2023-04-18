@@ -1,5 +1,4 @@
 #cargar librerías
-install.packages("stringr")
 library(readr)
 library(stringr)
 library(dplyr)
