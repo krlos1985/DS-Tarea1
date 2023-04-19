@@ -5,7 +5,7 @@ library(dplyr)
 library(tidyr)
 library(lubridate)
 
-#cargar datos
+#cargar datos (editar para la carga local de datos)
 epa_http <- read_table("Data Science/epa-http.csv", col_names = FALSE)
 
 #nombre columnas
